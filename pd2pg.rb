@@ -61,6 +61,18 @@ class PG2PD
     self.db = Sequel.connect(database_url)
   end
 
+  # time parse
+  def time_parse(x)
+    case
+    when x.is_a?(Time)
+      return x
+    when x.is_a?(String)
+      return Time.parse(x)
+    else
+      raise "Unknown type: #{x.class}"
+    end
+  end
+
   # Convert service API value into a DB record.
   def convert_service(s)
     {
@@ -93,7 +105,7 @@ class PG2PD
     {
       id: le["id"],
       type: le["type"],
-      created_at: Time.parse(le["created_at"]),
+      created_at: self.time_parse(le["created_at"]),
       incident_id: le["incident"]["id"],
       agent_type: le["agent"] && le["agent"]["type"],
       agent_id: le["agent"] && le["agent"]["id"],
@@ -170,7 +182,7 @@ class PG2PD
     # Calculate the point from which we should resume incremental
     # updates. Allow a bit of overlap to ensure we don't miss anything.
     last_record = db[collection].reverse_order(:created_at).first
-    latest = (last_record && last_record[:created_at]) || PAGERDUTY_EPOCH
+    latest = self.time_parse( (last_record && last_record[:created_at]) || PAGERDUTY_EPOCH )
     log("refresh_incremental.check", collection: collection, latest: latest.iso8601)
 
     # Update data in windowed time chunks. This will give us manageable
