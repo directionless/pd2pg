@@ -43,4 +43,4 @@ create table users (
 );
 
 -- Extension tablefunc enables crosstabs.
-create extension tablefunc;
+-- create extension tablefunc;

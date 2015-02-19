@@ -1,7 +1,8 @@
 require "json"
 require "excon"
 require "time"
-require "pg"
+#require "pg"
+require "sqlite3"
 require "sequel"
 
 # Ensure all data processing and storage is in UTC.
